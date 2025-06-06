@@ -1,7 +1,10 @@
 import datetime
 import pandas as pd
-from views import set_interval
+from views import hi_time
 
+'''Формируем приветственную фразу'''
+current_date = datetime.datetime.now()
+greeting = hi_time(current_date)
 
 def get_external_xls(path: str) -> list[dict]:
     '''Функция принимает файл Excel и возвращает датафрейм с переименованными столбцами'''
@@ -34,36 +37,63 @@ def filter_for_date(df: pd.DataFrame, date_begin, date_out) -> pd.DataFrame:
     return df_filter
 
 
-def grupp_in_cards(df: pd.DataFrame) -> dict:
+def grupp_in_cards(df: pd.DataFrame, trans_list: list[dict]) -> dict:
     '''Группируем транзакции по номерам карт'''
     df_grupp = df.groupby('cards').agg({
         "amount": 'sum',
         "cashback": 'sum'
     })
-    dict_cards = df_grupp.reset_index().to_dict(orient='records')
+    list_cards = df_grupp.reset_index().to_dict(orient='records')
+    card_list = []
+    resul = {}
 
-    result = dict()
-    for index, item in enumerate(dict_cards):
-        mask = get_mask_card_number(item["cards"])
-        result[f'cards{index+1}'] = {
-            "last_digits": mask, "total_spent": item["amount"], "cashback": item["cashback"]}
+    for i in list_cards:
+        mask = get_mask_card_number(i["cards"])
+        resul = {
+                "last_digits": mask, "total_spent": i["amount"], "cashback": i["cashback"]}
+        card_list.append(resul)
+    result = {
+        "greeting": greeting, "cards": card_list, "top_transactions": trans_list, "currency_rates": [], "stock_prices": []
+    }
     return result
-
-if __name__ == '__main__':
-    df = get_external_xls("date\\operations.xlsx")
-#    print(df.head(5))
-    current_date = datetime.datetime.now()
-    date_out = current_date.strftime("2021-%m-%d")
-    date_begin = current_date.strftime("2021-%m-01")
-    df.date = pd.to_datetime(df.date)
-    df_filter = df.loc[(df.date >= date_begin) & (df.date <= date_out)]
-    print(date_begin, date_out)
-    print(df_filter)
 
 
 def get_mask_card_number(number_card: str) -> str:
     """Функция возвращает маску номера банковской карты"""
     return str(number_card)[1:]
 
+
+def format_date(date: str) -> str:
+    '''Изменяем формат даты'''
+    date_now = date.strftime("%d.%m.%Y")
+    return date_now
+
+
+
+def sorted_by_amount(df: pd.DataFrame) -> list:
+    '''Сортируем датафрейм по сумме'''
+    df_amount = df.sort_values(by='amount', ascending=False)
+    trans_list = []
+    resul = {}
+    list_tr = df_amount.head(5).to_dict(orient='records')
+    for i in list_tr:
+        resul = {
+                "date": format_date(i["date"]), "amount": i["amount"], "category": i["category"],
+                "description": i["description"]
+        }
+        trans_list.append(resul)
+    return trans_list
+
+
+#    "date": "21.12.2021",
+#    "amount": 1198.23,
+#    "category": "Переводы",
+#    "description": "Перевод Кредитная карта. ТП 10.2 RUR"
+
+    return list_tr
+
+#if __name__ == '__main__':
+#    df = get_external_xls("date\\operations.xlsx")
+#    print(df.head(5))
 
 # print(get_mask_card_number("*3611"))
