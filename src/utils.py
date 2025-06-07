@@ -1,6 +1,14 @@
 import datetime
+import os
+import requests
 import pandas as pd
+import json
+from dotenv import load_dotenv
 from views import hi_time
+
+
+"""Загрузка переменных"""
+load_dotenv()
 
 '''Формируем приветственную фразу'''
 current_date = datetime.datetime.now()
@@ -37,7 +45,7 @@ def filter_for_date(df: pd.DataFrame, date_begin, date_out) -> pd.DataFrame:
     return df_filter
 
 
-def grupp_in_cards(df: pd.DataFrame, trans_list: list[dict]) -> dict:
+def grupp_in_cards(df: pd.DataFrame, trans_list: list[dict], list_currency: list[dict], list_stocks: list[dict]) -> dict:
     '''Группируем транзакции по номерам карт'''
     df_grupp = df.groupby('cards').agg({
         "amount": 'sum',
@@ -53,7 +61,8 @@ def grupp_in_cards(df: pd.DataFrame, trans_list: list[dict]) -> dict:
                 "last_digits": mask, "total_spent": i["amount"], "cashback": i["cashback"]}
         card_list.append(resul)
     result = {
-        "greeting": greeting, "cards": card_list, "top_transactions": trans_list, "currency_rates": [], "stock_prices": []
+        "greeting": greeting, "cards": card_list, "top_transactions": trans_list, "currency_rates": list_currency,
+        "stock_prices": list_stocks
     }
     return result
 
@@ -85,14 +94,47 @@ def sorted_by_amount(df: pd.DataFrame) -> list:
     return trans_list
 
 
-#    "date": "21.12.2021",
-#    "amount": 1198.23,
-#    "category": "Переводы",
-#    "description": "Перевод Кредитная карта. ТП 10.2 RUR"
+with open('user_settings.json', 'r') as file:
+    data = json.load(file)
+    currency = data["user_currencies"]
+    symbols = ",".join(currency)
+    user_stocks = data["user_stocks"]
 
-    return list_tr
+def get_user_latest(symbols: str) -> list:
+    '''Функция запрашивает курсы валют и преобразует в список словарей'''
+    url = f"https://api.apilayer.com/exchangerates_data/latest?symbols={symbols}&base=RUB"
+    headers = {'apikey': os.getenv('API_KEY')}
+    response = requests.get(url, headers=headers)
+    result = response.json()
+    my_list = []
+    my_dict = result["rates"]
+    for key, value in my_dict.items():
+        new_dict = {"currency": key, "rate": value}
+        my_list.append(new_dict)
+    if response.status_code != 200:
+        return 'Ошибка при обращении к API 400 - error'
+    return my_list
 
-#if __name__ == '__main__':
+
+def get_user_stocks(user_stocks: list) -> list:
+    '''Функция получает с API котировки акций и преобразует в список словарей '''
+    my_list = []
+    for stock in user_stocks:
+        url = (f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={stock}&apikey={os.getenv('API__KEY')}')
+        r = requests.get(url)
+        data = r.json()
+        m_dict = data["Global Quote"]
+        my_dict = {"stock": m_dict['01. symbol'], "price": m_dict['05. price']}
+        my_list.append(my_dict)
+        if r.status_code != 200:
+            return 'Ошибка при обращении к API 400 - error'
+    return my_list
+
+
+# if __name__ == "__main__":
+#    result = get_user_stocks(user_stocks)
+#    print(result)
+
 #    df = get_external_xls("date\\operations.xlsx")
 #    print(df.head(5))
 

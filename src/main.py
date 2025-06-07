@@ -1,8 +1,13 @@
 import datetime
 import json
+from dotenv import load_dotenv
 from views import hi_time
 from utils import get_external_xls, filter_for_date, grupp_in_cards, sorted_by_amount
+from utils import get_user_latest, get_user_stocks
 
+
+"""Загрузка переменных"""
+load_dotenv()
 
 '''Формируем приветственную фразу'''
 current_date = datetime.datetime.now()
@@ -24,8 +29,21 @@ df_filter = filter_for_date(df, date_begin, date_out)
 list_trans = sorted_by_amount(df_filter)
 # print(list_trans)
 
+'''Получаем параметры из JSON, курс валют из API и преобразуем в список словарей'''
+with open('user_settings.json', 'r') as file:
+    data = json.load(file)
+    currency = data["user_currencies"]
+    symbols = ",".join(currency)
+    list_currency =  get_user_latest(symbols)
+
+'''Получаем параметры из JSON, котировки акций из API и преобразуем в список словарей'''
+with open('user_settings.json', 'r') as file:
+    data = json.load(file)
+    user_stocks = data["user_stocks"]
+    list_stocks = get_user_stocks(user_stocks)
+
 '''Группируем по номерам карт и формируем соварь для JSON'''
-dict_data = grupp_in_cards(df_filter, list_trans)
+dict_data = grupp_in_cards(df_filter, list_trans, list_currency, list_stocks)
 # print(dict_data)
 
 '''Формируем JSON-ответ'''
