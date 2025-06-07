@@ -24,12 +24,3 @@ def set_interval(current_date: str) -> str:
     date_begin = current_date.strftime("01.%m.2021")
     return date_begin, date_out
 
-if __name__ == '__main__':
-    current_date = datetime.datetime.now()
-    date_begin, date_out = set_interval(current_date)
-    print(date_begin, date_out)
-
-
-# def json_answer(data: dict) -> None:
-#    json_data = json.dumps(data)
-#    print(json_data)

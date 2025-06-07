@@ -78,7 +78,6 @@ def format_date(date: str) -> str:
     return date_now
 
 
-
 def sorted_by_amount(df: pd.DataFrame) -> list:
     '''Сортируем датафрейм по сумме'''
     df_amount = df.sort_values(by='amount', ascending=False)
