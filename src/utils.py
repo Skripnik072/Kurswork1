@@ -14,18 +14,19 @@ load_dotenv()
 current_date = datetime.datetime.now()
 greeting = hi_time(current_date)
 
-def get_external_xls(path: str) -> list[dict]:
+def get_external_xls(path: str) -> pd.DataFrame:
     '''Функция принимает файл Excel и возвращает датафрейм с переименованными столбцами'''
     my_dict = {}
     my_list = []
     try:
         excel_data = pd.read_excel(path)
 #        print(excel_data.head(3)
-        df = excel_data.iloc[:, [0,2,5,8,9,11,14]]
+        df = excel_data.iloc[:, [0,2,5,6,8,9,11,14]]
         newcols = {'Дата операции': 'date',
                    'Номер карты': 'cards',
                    'Сумма операции с округлением': 'amount',
                    'Валюта операции': 'currency',
+                   'Сумма платежа': 'payments',
                    'Кэшбэк': 'cashback',
                    'Категория': 'category',
                    'Описание': 'description'
@@ -36,7 +37,7 @@ def get_external_xls(path: str) -> list[dict]:
     return df
 
 
-def filter_for_date(df: pd.DataFrame, date_begin, date_out) -> pd.DataFrame:
+def filter_for_date(df: pd.DataFrame, date_begin: str, date_out: str) -> pd.DataFrame:
     '''Отфильтровываем датафрейм по диапазону дат и убираем значение NaN'''
     df.date = pd.to_datetime(df.date)
     df_filt_data = df.loc[(df.date >= date_begin) & (df.date <= date_out)]
@@ -122,15 +123,16 @@ def get_user_stocks(user_stocks: list) -> list:
         url = (f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={stock}&apikey={os.getenv('API__KEY')}')
         r = requests.get(url)
         data = r.json()
-        m_dict = data["Global Quote"]
+        m_dict = data['Global Quote']
         my_dict = {"stock": m_dict['01. symbol'], "price": m_dict['05. price']}
         my_list.append(my_dict)
         if r.status_code != 200:
+            print(f"{r.status_code}Ошибка при обращении к API 400 - error")
             return 'Ошибка при обращении к API 400 - error'
     return my_list
 
 
-# if __name__ == "__main__":
+#if __name__ == "__main__":
 #    result = get_user_stocks(user_stocks)
 #    print(result)
 
