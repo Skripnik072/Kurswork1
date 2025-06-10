@@ -1,6 +1,5 @@
 import datetime
 import pandas as pd
-from utils import get_external_xls, filter_for_date
 
 
 current_date = datetime.datetime.now()
@@ -40,10 +39,13 @@ def spending_by_category(df_filter: pd.DataFrame, category: str ) -> pd.DataFram
     return df_filt
 
 
-if __name__ == "__main__":
-    df = get_external_xls("date\\operations.xlsx")
-    df_filter = filter_period(df, "05.05.2021")
-    df_filtr = spending_by_category(df_filter, "транспорт")
-    print(df_filtr)
+# if __name__ == "__main__":
+#    date = time_minus_3_month("05.06.2023")
+#    print(date)
+
+#    df = get_external_xls("date\\operations.xlsx")
+#    df_filter = filter_period(df, "05.05.2021")
+#    df_filtr = spending_by_category(df_filter, "транспорт")
+#    print(df_filtr)
 
 

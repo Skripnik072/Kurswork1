@@ -12,7 +12,7 @@ load_dotenv()
 
 '''Формируем приветственную фразу'''
 current_date = datetime.datetime.now()
-greeting = hi_time(current_date)
+greeting = hi_time()
 
 def get_external_xls(path: str) -> pd.DataFrame:
     '''Функция принимает файл Excel и возвращает датафрейм с переименованными столбцами'''
@@ -100,43 +100,43 @@ with open('user_settings.json', 'r') as file:
     symbols = ",".join(currency)
     user_stocks = data["user_stocks"]
 
-def get_user_latest(symbols: str) -> list:
-    '''Функция запрашивает курсы валют и преобразует в список словарей'''
-    url = f"https://api.apilayer.com/exchangerates_data/latest?symbols={symbols}&base=RUB"
-    headers = {'apikey': os.getenv('API_KEY')}
-    response = requests.get(url, headers=headers)
-    result = response.json()
-    my_list = []
-    my_dict = result["rates"]
-    for key, value in my_dict.items():
-        new_dict = {"currency": key, "rate": value}
-        my_list.append(new_dict)
-    if response.status_code != 200:
-        return 'Ошибка при обращении к API 400 - error'
-    return my_list
+# def get_user_latest(symbols: str) -> list:
+#    '''Функция запрашивает курсы валют и преобразует в список словарей'''
+#    url = f"https://api.apilayer.com/exchangerates_data/latest?symbols={symbols}&base=RUB"
+#    headers = {'apikey': os.getenv('API_KEY')}
+#    response = requests.get(url, headers=headers)
+#    result = response.json()
+#    my_list = []
+#    my_dict = result["rates"]
+#    for key, value in my_dict.items():
+#        new_dict = {"currency": key, "rate": value}
+#        my_list.append(new_dict)
+#    if response.status_code != 200:
+#        return 'Ошибка при обращении к API 400 - error'
+#    return my_list
 
 
-def get_user_stocks(user_stocks: list) -> list:
-    '''Функция получает с API котировки акций и преобразует в список словарей '''
-    my_list = []
-    for stock in user_stocks:
-        url = (f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={stock}&apikey={os.getenv('API__KEY')}')
-        r = requests.get(url)
-        data = r.json()
-        m_dict = data['Global Quote']
-        my_dict = {"stock": m_dict['01. symbol'], "price": m_dict['05. price']}
-        my_list.append(my_dict)
-        if r.status_code != 200:
-            print(f"{r.status_code}Ошибка при обращении к API 400 - error")
-            return 'Ошибка при обращении к API 400 - error'
-    return my_list
+# def get_user_stocks(user_stocks: list) -> list:
+#    '''Функция получает с API котировки акций и преобразует в список словарей '''
+#    my_list = []
+#    for stock in user_stocks:
+#        url = (f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={stock}&apikey={os.getenv('API__KEY')}')
+#        r = requests.get(url)
+#        data = r.json()
+#        m_dict = data['Global Quote']
+#        my_dict = {"stock": m_dict['01. symbol'], "price": m_dict['05. price']}
+#        my_list.append(my_dict)
+#        if r.status_code != 200:
+#            print(f"{r.status_code}Ошибка при обращении к API 400 - error")
+#            return 'Ошибка при обращении к API 400 - error'
+#    return my_list
+
+if __name__ == "__main__":
+    df = get_external_xls("date\\operations.xlsx")
+    print(df.head(1))
 
 
-#if __name__ == "__main__":
 #    result = get_user_stocks(user_stocks)
 #    print(result)
-
-#    df = get_external_xls("date\\operations.xlsx")
-#    print(df.head(5))
 
 # print(get_mask_card_number("*3611"))
