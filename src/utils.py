@@ -3,8 +3,17 @@ import os
 import requests
 import pandas as pd
 import json
+import logging
 from dotenv import load_dotenv
 from src.views import hi_time
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler('C:/Users/it-pc.ru/PycharmProjects/PythonProject2/logs/utils.log',
+                                   encoding='utf-8')
+file_formatter = logging.Formatter('%(asctime)s %(filename)s %(levelname)s: %(message)s')
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
 
 """Загрузка переменных"""
 load_dotenv()
@@ -18,6 +27,7 @@ def get_external_xls(path: str) -> pd.DataFrame:
     my_dict = {}
     my_list = []
     try:
+        logger.info(f'Файо найден {path}')
         excel_data = pd.read_excel(path)
         df = excel_data.iloc[:, [0, 2, 5, 6, 8, 9, 11, 14]]
         newcols = {'Дата операции': 'date',
@@ -31,16 +41,20 @@ def get_external_xls(path: str) -> pd.DataFrame:
                    }
         df.rename(columns=newcols, inplace=True)
     except FileNotFoundError:
+        logger.error(f'Файл не найден')
         raise FileNotFoundError("Файл не найден")
+
     return df
 
 
 def filter_for_date(df: pd.DataFrame, date_begin: str, date_out: str) -> pd.DataFrame:
     '''Отфильтровываем датафрейм по диапазону дат и убираем значение NaN'''
+
     df.date = pd.to_datetime(df.date)
     df_filt_data = df.loc[(df.date >= date_begin) & (df.date <= date_out)]
     df_filter = df_filt_data.loc[df_filt_data.cards.notnull()]
     df_filter['cashback'].fillna(0, inplace=True)
+    logger.info(f'Датафрейм отфильтрован в выбранном диапазоне, убран NaN')
     return df_filter
 
 
@@ -52,6 +66,7 @@ def grupp_in_cards(df: pd.DataFrame, trans_list: list[dict], list_currency: list
         "cashback": 'sum'
     })
     list_cards = df_grupp.reset_index().to_dict(orient='records')
+    logger.info(f'Транзакции сгруппированы по номерам карт')
     card_list = []
     resul = {}
 
@@ -60,27 +75,32 @@ def grupp_in_cards(df: pd.DataFrame, trans_list: list[dict], list_currency: list
         resul = {
             "last_digits": mask, "total_spent": i["amount"], "cashback": i["cashback"]}
         card_list.append(resul)
+        logger.info(f'Сформирован список сумм платежей и кэшбека для каждой карты')
     result = {
         "greeting": greeting, "cards": card_list, "top_transactions": trans_list, "currency_rates": list_currency,
         "stock_prices": list_stocks
     }
+    logger.info(f'Сформирован словарь для передачи в JSON')
     return result
 
 
 def get_mask_card_numb(number_card: str) -> str:
     """Функция возвращает маску номера банковской карты"""
+    logger.info(f'Маска банковской карты выполнена')
     return str(number_card)[1:]
 
 
 def format_date(date: str) -> str:
     '''Изменяем формат даты'''
     date_now = date.strftime("%d.%m.%Y")
+    logger.info(f'Дата операции преобразована в строку {date_now}')
     return date_now
 
 
 def sorted_by_amount(df: pd.DataFrame) -> list:
     '''Сортируем датафрейм по сумме'''
     df_amount = df.sort_values(by='amount', ascending=False)
+    logger.info(f'Датафрейм отсортирован по сумме платежа')
     trans_list = []
     resul = {}
     list_tr = df_amount.head(5).to_dict(orient='records')
@@ -90,6 +110,7 @@ def sorted_by_amount(df: pd.DataFrame) -> list:
             "description": i["description"]
         }
         trans_list.append(resul)
+        logger.info(f'Сформирован список топ-5 транзакций')
     return trans_list
 
 
@@ -98,10 +119,12 @@ with open('C:/Users/it-pc.ru/PycharmProjects/PythonProject2/user_settings.json',
     currency = data["user_currencies"]
     symbols = ",".join(currency)
     user_stocks = data["user_stocks"]
+    logger.info(f'Определены параметры для запросов к API {symbols}, {user_stocks}')
 
 
 def get_user_latest(symbols: str) -> list:
     '''Функция запрашивает курсы валют и преобразует в список словарей'''
+    logger.info(f'Направлен запрос на получение курса валют')
     url = f"https://api.apilayer.com/exchangerates_data/latest?symbols={symbols}&base=RUB"
     headers = {'apikey': os.getenv('API_KEY')}
     response = requests.get(url, headers=headers)
@@ -112,13 +135,16 @@ def get_user_latest(symbols: str) -> list:
         new_dict = {"currency": key, "rate": value}
         my_list.append(new_dict)
     if response.status_code != 200:
+        logger.error(f'Ошибка обращения к API')
         return 'Ошибка при обращении к API 400 - error'
+
     return my_list
 
 
 def get_user_stocks(user_stocks: list) -> list:
     '''Функция получает с API котировки акций и преобразует в список словарей '''
     my_list = []
+    logger.info(f'Направляем запросы на получение курса акций')
     for stock in user_stocks:
         url = (f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={stock}&apikey={os.getenv('API__KEY')}')
         r = requests.get(url)
@@ -128,6 +154,7 @@ def get_user_stocks(user_stocks: list) -> list:
         my_list.append(my_dict)
         if r.status_code != 200:
             print(f"{r.status_code}Ошибка при обращении к API 400 - error")
+            logger.error(f'Ошибка обращения к API')
             return 'Ошибка при обращении к API 400 - error'
     return my_list
 

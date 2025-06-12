@@ -1,4 +1,14 @@
 import datetime
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler('C:/Users/it-pc.ru/PycharmProjects/PythonProject2/logs/views.log',
+                                   encoding='utf-8')
+file_formatter = logging.Formatter('%(asctime)s %(filename)s %(levelname)s: %(message)s')
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
 
 
 def hi_time() -> str:
@@ -13,14 +23,17 @@ def hi_time() -> str:
         text = "Добрый вечер!"
     else:
         text = "Доброй ночи!"
+    logger.info(f'Определен тип приветствия -  {text}')
     return text
 
 
 def set_interval(current_date: str) -> str:
     '''Определяем диапазон дат для анализа'''
+    logger.info(f'Определяем диапазон дат для анализа')
     current_date = datetime.datetime.now()
     date_out = current_date.strftime("%d.%m.2021")
     date_begin = current_date.strftime("01.%m.2021")
+    logger.info(f'Диапазон дат определен {date_begin} - {date_out}')
     return date_begin, date_out
 
 # if __name__ == "__main__":
