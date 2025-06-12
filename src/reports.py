@@ -1,5 +1,6 @@
 import datetime
 import pandas as pd
+from src.utils import get_external_xls
 
 
 current_date = datetime.datetime.now()
@@ -24,8 +25,9 @@ def filter_period(df: pd.DataFrame, data_end: str) -> pd.DataFrame:
         data_out = data_end
     else:
         data_out = current_date
-
     data_begin = time_minus_3_month(data_end)
+
+    '''Отфильтровываем датафрейм по диапазону дат'''
     df.date = pd.to_datetime(df.date)
     df_filtr = df.loc[(df.date >= data_begin) & (df.date <= data_out)]
     return df_filtr
@@ -45,7 +47,7 @@ def spending_by_category(df_filter: pd.DataFrame, category: str ) -> pd.DataFram
 
 #    df = get_external_xls("date\\operations.xlsx")
 #    df_filter = filter_period(df, "05.05.2021")
-#    df_filtr = spending_by_category(df_filter, "транспорт")
+#    df_filtr = spending_by_category(df_filter, "супермаркеты")
 #    print(df_filtr)
 
 

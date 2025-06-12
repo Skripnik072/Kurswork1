@@ -23,6 +23,6 @@ def set_interval(current_date: str) -> str:
     date_begin = current_date.strftime("01.%m.2021")
     return date_begin, date_out
 
-if __name__ == "__main__":
-    privet = hi_time()
-    print(privet)
+# if __name__ == "__main__":
+#    privet = hi_time()
+#    print(privet)

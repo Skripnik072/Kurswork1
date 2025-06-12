@@ -1,11 +1,11 @@
 import datetime
 import json
 from dotenv import load_dotenv
-from views import hi_time
-from utils import get_external_xls, filter_for_date, grupp_in_cards, sorted_by_amount
-from utils import get_user_latest, get_user_stocks
-from services import get_searh_to_string
-from reports import filter_period, spending_by_category
+from src.views import hi_time
+from src.utils import get_external_xls, filter_for_date, grupp_in_cards, sorted_by_amount
+from src.utils import get_user_latest, get_user_stocks
+from src.services import get_searh_to_string
+from src.reports import filter_period, spending_by_category
 
 
 '''Формируем код для страницы "Главная"'''
@@ -15,7 +15,7 @@ load_dotenv()
 
 '''Формируем приветственную фразу'''
 current_date = datetime.datetime.now()
-greeting = hi_time(current_date)
+greeting = hi_time()
 print(greeting)
 
 '''Создаем датафрейм, отфильтровываем нужные и переименовываем столбцы'''
@@ -41,10 +41,10 @@ with open('user_settings.json', 'r') as file:
     list_currency =  get_user_latest(symbols)
 
 '''Получаем параметры из JSON, котировки акций из API и преобразуем в список словарей'''
-# with open('user_settings.json', 'r') as file:
-#    data = json.load(file)
-#    user_stocks = data["user_stocks"]
-#    list_stocks = get_user_stocks(user_stocks)
+with open('user_settings.json', 'r') as file:
+    data = json.load(file)
+    user_stocks = data["user_stocks"]
+    list_stocks = get_user_stocks(user_stocks)
 
 '''Группируем по номерам карт и формируем словарь для JSON'''
 dict_data = grupp_in_cards(df_filter, list_trans, list_currency, [])
