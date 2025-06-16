@@ -6,14 +6,14 @@ import pytest
 def pd_Data_Frame():
     df = pd.DataFrame(
         {
-            "date": ["01.05.2021 16:44:00"],
+            "date": ["05.05.2021 00:00:00"],
             "cards": ["*7197"],
             "currency": ["RUB"],
             "payments": [-460.89],
             "cashback": ["NaN"],
             "category": ["Супермаркеты"],
             "description": ["Колхоз"],
-            "amount": [460.89],
+            "amount": [460.89]
         }
     )
     return df
@@ -23,7 +23,7 @@ def pd_Data_Frame2():
     df = pd.DataFrame(
         [
             {
-                "date": ["01.05.2021 16:44:00"],
+                "date": ["05.05.2021 16:44:00"],
                 "cards": ["*7197"],
                 "currency": ["RUB"],
                 "payments": [-460.89],
@@ -43,7 +43,7 @@ def pd_Data_Frame2():
                 "amount": [560.89],
             },
             {
-                "date": ["05.05.2021 16:44:00"],
+                "date": ["01.05.2021 16:44:00"],
                 "cards": ["*6195"],
                 "currency": ["RUB"],
                 "payments": [-760.89],
@@ -58,4 +58,4 @@ def pd_Data_Frame2():
 
 @pytest.fixture()
 def data2():
-    return "2023-02-06 00:00:00"
+    return "2021-02-06 00:00:00"

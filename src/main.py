@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import os
 from dotenv import load_dotenv
 from src.views import hi_time
 from src.utils import get_external_xls, filter_for_date, grupp_in_cards, sorted_by_amount
@@ -8,10 +9,14 @@ from src.utils import get_user_latest, get_user_stocks
 from src.services import get_searh_to_string
 from src.reports import filter_period, spending_by_category
 
+'''Формируем абсолютные пути к файлам'''
+path1 = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs', 'main.log')
+path2 =  os.path.join(os.path.dirname(os.path.dirname(__file__)), 'date', 'operations.xlsx')
+path3 = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'user_settings.json')
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler('C:/Users/it-pc.ru/PycharmProjects/PythonProject2/logs/main.log',
-                                   encoding='utf-8')
+file_handler = logging.FileHandler(path1, encoding='utf-8')
 file_formatter = logging.Formatter('%(asctime)s %(filename)s %(levelname)s: %(message)s')
 file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
@@ -28,7 +33,7 @@ greeting = hi_time()
 logger.info(f'Определено привествие"')
 
 '''Создаем датафрейм, отфильтровываем нужные и переименовываем столбцы'''
-df = get_external_xls("date\\operations.xlsx")
+df = get_external_xls(path2)
 logger.info(f'Датафрейм создан. Столбцы переименованы')
 
 '''Определяем диапазон дат для анализа'''
@@ -47,7 +52,7 @@ logger.info(f'Датафрей отсортирован по сумме')
 # print(list_trans)
 
 '''Получаем параметры из JSON, курс валют из API и преобразуем в список словарей'''
-with open('user_settings.json', 'r') as file:
+with open(path3, 'r') as file:
     data = json.load(file)
     currency = data["user_currencies"]
     symbols = ",".join(currency)
@@ -55,14 +60,18 @@ with open('user_settings.json', 'r') as file:
     logger.info(f'Получены курсы валют из API')
 
 '''Получаем параметры из JSON, котировки акций из API и преобразуем в список словарей'''
-with open('user_settings.json', 'r') as file:
+with open(path3, 'r') as file:
     data = json.load(file)
     user_stocks = data["user_stocks"]
     list_stocks = get_user_stocks(user_stocks)
     logger.info(f'Получены курсы акций из API')
 
 '''Группируем по номерам карт и формируем словарь для JSON'''
-dict_data = grupp_in_cards(df_filter, list_trans, list_currency, list_stocks)
+card_list = grupp_in_cards(df_filter)
+dict_data = {
+        "greeting": greeting, "cards": card_list, "top_transactions": list_trans, "currency_rates": list_currency,
+        "stock_prices": list_stocks
+    }
 logger.info(f'Сформирован словарь для JSON-ответа')
 # print(dict_data)
 
@@ -72,7 +81,7 @@ logger.info(f'Сформирован JSON-ответ для страницы "Г
 print(json_data)
 
 '''Формируем список для JSON'''
-list_data = get_searh_to_string("date\\operations.xlsx", "супермаркеты")
+list_data = get_searh_to_string(path2, "супермаркеты")
 logger.info(f'Сформирован список отфильтрованный по ключевому слову')
 
 '''Формируем код для страницы "Поиск"'''

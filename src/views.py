@@ -1,11 +1,13 @@
 import datetime
 import logging
+import os
 
+
+path1 = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs', 'views.log')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler('C:/Users/it-pc.ru/PycharmProjects/PythonProject2/logs/views.log',
-                                   encoding='utf-8')
+file_handler = logging.FileHandler(path1, encoding='utf-8')
 file_formatter = logging.Formatter('%(asctime)s %(filename)s %(levelname)s: %(message)s')
 file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
@@ -39,3 +41,6 @@ def set_interval(current_date: str) -> str:
 # if __name__ == "__main__":
 #    privet = hi_time()
 #    print(privet)
+#    print(path1)
+#    print(path2)
+#    print(joined_path)

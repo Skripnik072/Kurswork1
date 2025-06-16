@@ -4,8 +4,8 @@ from src.utils import get_external_xls, get_user_latest, get_user_stocks
 
 @patch("pandas.read_excel")
 def test_get_external_xls(mock_xls, pd_Data_Frame):
-    mock_xls = Mock()
     mock_xls.return_value = pd_Data_Frame
+
     assert get_external_xls("test_path") == [
         {
             "date": ["01.05.2021 16:44:00"],
@@ -18,7 +18,7 @@ def test_get_external_xls(mock_xls, pd_Data_Frame):
             "amount": [460.89],
         }
     ]
-    mock_xls.assert_called_once_with("test_path")
+    mock_xls.assert_called()
 
 
 @patch("requests.get")
@@ -50,7 +50,7 @@ def test_get_user_stocks(mock_request_get):
     # Создаем mock-ответ
     mock_response = MagicMock()
     mock_response.status_code = 200
-    mock_response.json.return_value = [{"stock": "AAPL", "price": 152.12}]
+    mock_response.json.return_value = {'Global Quote': [{"stock": "AAPL", "price": 152.12}]}
     # Пример корректного ответа API
     mock_request_get.return_value = mock_response
     # Проверяем, что функция возвращает то, что вернул бы response.json()

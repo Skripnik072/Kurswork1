@@ -18,4 +18,4 @@ def test_filter_to_string(mock_xls, pd_Data_Frame):
 
 def test_filter_to_error():
     with pytest.raises(FileNotFoundError, match="Файл не найден"):
-        get_searh_to_string('operations.xlsx', "Перевод")
+        get_searh_to_string('operation.xlsx', "Перевод")

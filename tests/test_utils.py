@@ -10,11 +10,11 @@ from tests.conftest import pd_Data_Frame
 
 def test_error_cod():
     with pytest.raises(FileNotFoundError, match="Файл не найден"):
-        get_external_xls("operations.xlsx")
+        get_external_xls("operation.xlsx")
 
 
 def test_filter_for_date(pd_Data_Frame):
-    expected_df = pd.DataFrame(
+   expected_df = pd.DataFrame(
         {
             "date": ["01.05.2021 16:44:00"],
             "cards": ["*7197"],
@@ -25,26 +25,22 @@ def test_filter_for_date(pd_Data_Frame):
             "description": ["Колхоз"],
             "amount": [460.89],
         }
-    )
-    expected_df["date"] = pd.to_datetime(expected_df["date"])
-    pd_Data_Frame.date = pd.to_datetime(pd_Data_Frame.date)
-    result_df = filter_for_date(pd_Data_Frame, "01.05.2021", "05.05.2021")
-    pdt.assert_frame_equal(result_df, expected_df)
+   )
+   expected_df["date"] = pd.to_datetime(expected_df["date"])
+   pd_Data_Frame.date = pd.to_datetime(pd_Data_Frame.date)
+   result_df = filter_for_date(pd_Data_Frame, "01.05.2021", "05.05.2021")
+   pdt.assert_frame_equal(result_df, expected_df)
 
 
 def test_grupp_in_cards(pd_Data_Frame):
-    expected_dict = {
-        "greeting": ["Добрый день!"],
-        "cards": [{"7197": [{"total_spent": [920], "cashback": [0]}]}],
-        "top_transactions": [],
-        "currency_rates": [],
-        "stock_prices": [],
-    }
-    assert grupp_in_cards(pd_Data_Frame, [], [], []) == expected_dict
+    expected_list = [
+        {'last_digits': '7197', 'total_spent': 3027.37, 'cashback': 0.0}
+    ]
+    assert grupp_in_cards(pd_Data_Frame) == expected_list
 
 
 def test_get_mask_card_numb():
-    assert get_mask_card_numb("*7197") == "7197"
+   assert get_mask_card_numb("*7197") == "7197"
 
 
 def test_format_date(data2):

@@ -1,18 +1,22 @@
 import datetime
+from datetime import datetime
 import pandas as pd
 import logging
+import os
 from src.utils import get_external_xls
 
 
+path1 = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs', 'reports.log')
+path2 =  os.path.join(os.path.dirname(os.path.dirname(__file__)), 'date', 'operations.xlsx')
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler('C:/Users/it-pc.ru/PycharmProjects/PythonProject2/logs/reports.log',
-                                   encoding='utf-8')
+file_handler = logging.FileHandler(path1, encoding='utf-8')
 file_formatter = logging.Formatter('%(asctime)s %(filename)s %(levelname)s: %(message)s')
 file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
 
-current_date = datetime.datetime.now()
+current_date = datetime.now()
 data_end = "06.05.2021"
 logger.info(f'Выбрана дата окончания трехмесячного диапазона')
 
@@ -28,12 +32,12 @@ def time_minus_3_month(data_end: str) -> str:
     return new_stamp
 
 
-def filter_period(df: pd.DataFrame, data_end: str) -> pd.DataFrame:
+def filter_period(df: pd.DataFrame, data_end: str=current_date) -> pd.DataFrame:
     '''Функция из датафрейма формирует список расходов за период 3 месяца до выбранной даты'''
     '''Определяем диапазон дат для анализа'''
 
     if data_end:
-        data_out = data_end
+        data_out = datetime.strptime(data_end, "%d.%m.%Y")
     else:
         data_out = current_date
     data_begin = time_minus_3_month(data_end)
@@ -54,18 +58,22 @@ def spending_by_category(df_filter: pd.DataFrame, category: str ) -> pd.DataFram
     logger.info(f'Расходы по выбранной категории подсчитаны')
     pay_list = df_filt.to_dict(orient='records')
     pay_dict = {}
+    my_list = []
     for i in pay_list:
-        pay_dict = {"Категория": category, "Расходы": i['payments']}
-    return pay_dict
+        pay_dict = {"Категория": [category], "Расходы": [i['payments']]}
+        my_list.append(pay_dict)
+    return my_list
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
+    df = get_external_xls(path2)
+    df_filter = filter_period(df, "05.05.2021")
+    pay_list = spending_by_category(df_filter, "супермаркеты")
+    print(pay_list)
+
+#     print(df_filtr)
+
+
 #    date = time_minus_3_month("05.06.2023")
-#    print(date)
-
-#    df = get_external_xls("C:/Users/it-pc.ru/PycharmProjects/PythonProject2/date/operations.xlsx")
-#    df_filter = filter_period(df, "05.05.2021")
-#    pay_list = spending_by_category(df_filter, "супермаркеты")
-#    print(pay_list)
 
 
