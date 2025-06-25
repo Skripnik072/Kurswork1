@@ -1,7 +1,7 @@
-import pandas as pd
 import logging
 import os
 
+import pandas as pd
 
 path1 = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs', 'services.log')
 
@@ -19,16 +19,20 @@ def get_searh_to_string(path: str, str_descr: str) -> list[dict]:
     my_list = []
     try:
         excel_data = pd.read_excel(path)
-        logger.info(f'Файо найден {path}')
-        logger.info(f'Получаем датафрейм из файла Excel')
+        logger.info(f'Файл найден {path}')
+        logger.info('Получаем датафрейм из файла Excel')
         '''Выбираем транзакции по строке из Описания или Категории'''
         df = excel_data[excel_data['Описание'].str.contains(str_descr, case=False) |
                         excel_data['Категория'].str.contains(str_descr, case=False)]
 #        df['Кэшбек'].fillna(0, inplace=True)
         my_list = df.to_dict(orient='records')
-        logger.info(f'Выбраны транзакции по ключевому слову')
+        # while len(my_list) == 0:
+        #     print("Нет таких слов в категориях или описании транзакций. Введите другое слово!")
+        #
+        #     logger.info('Транзакции по ключевому слову не найдены')
+        logger.info('Выбраны транзакции по ключевому слову')
     except FileNotFoundError:
-        logger.error(f'Файл не найден')
+        logger.error('Файл не найден')
         raise FileNotFoundError("Файл не найден")
     return my_list
 

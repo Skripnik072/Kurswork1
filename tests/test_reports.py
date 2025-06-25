@@ -1,13 +1,12 @@
-import pytest
 import pandas as pd
 import pandas.testing as pdt
-import datetime
-from src.reports import time_minus_3_month, filter_period, spending_by_category
+
+from src.reports import filter_period, spending_by_category, time_minus_3_month
 
 
 def test_time_minus():
     stamp = pd.Timestamp("2021-02-06 00:00:00")
-    assert time_minus_3_month("05.06.2021") == stamp
+    assert time_minus_3_month("2021-05-06 00:00:00") == stamp
 
 
 def test_filter_period(pd_Data_Frame):
@@ -30,6 +29,5 @@ def test_filter_period(pd_Data_Frame):
 
 
 def test_spending_by_category(pd_Data_Frame):
-    expected_df = pd.DataFrame([{"Категория": ["Супермаркеты"], "Расходы": [-460.89]}])
-    assert spending_by_category(pd_Data_Frame,"Супермаркеты") == [{"Категория": ["Супермаркеты"],
-                                                                           "Расходы": [-460.89]}]
+    expected = [{"Категория": ["Супермаркеты"], "Расходы": [-460.89]}]
+    assert spending_by_category(pd_Data_Frame, "Супермаркеты") == expected
