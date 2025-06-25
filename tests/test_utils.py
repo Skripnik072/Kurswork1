@@ -43,8 +43,8 @@ def test_get_mask_card_numb():
 
 def test_sorted_by_amount(pd_Data_Frame2):
     expected_list = [
-        {"date": ["05.05.2021 00:00:00"], "amount": [760.89], "category": ["Супермаркеты"], "description": ["Переводы"]},
-        {"date": ["02.05.2021 00:00:00"], "amount": [560.89], "category": ["Супермаркеты"], "description": ["Город"]},
-        {"date": ["01.05.2021 00:00:00"], "amount": [460.89], "category": ["Супермаркеты"], "description": ["Колхоз"]},
+        {"date": "2021-05-05 00:00:00", "amount": [760.89], "category": ["Супермаркеты"], "description": ["Переводы"]},
+        {"date": "2021-05-02 00:00:00", "amount": [560.89], "category": ["Супермаркеты"], "description": ["Город"]},
+        {"date": "2021-05-01 00:00:00", "amount": [460.89], "category": ["Супермаркеты"], "description": ["Колхоз"]},
     ]
     assert sorted_by_amount(pd_Data_Frame2) == expected_list

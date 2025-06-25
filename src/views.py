@@ -52,7 +52,7 @@ def find_begin_month(data_out: str) -> str:
     '''Функция задает диапазон от начала месяца до выбранной даты'''
     dt = pd.Timestamp(data_out)
     date_begin = dt.replace(day=1)
-    date_begin = date_begin.strftime("%d-%m-%Y %H:%M:%S")
+    date_begin = date_begin.strftime("%Y-%m-%d %H:%M:%S")
     logger.info('Диапазон дат для выборки определен')
     return date_begin, data_out
 

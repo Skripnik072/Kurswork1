@@ -120,8 +120,9 @@ def sorted_by_amount(df: pd.DataFrame) -> list:
     resul = {}
     list_tr = df_amount.head(5).to_dict(orient='records')
     for i in list_tr:
+        date = datetime.strftime(i['date'],'%Y-%m-%d %H:%M:%S')
         resul = {
-            "date": i["date"], "amount": i["amount"], "category": i["category"],
+            "date": date, "amount": i["amount"], "category": i["category"],
             "description": i["description"]
         }
         trans_list.append(resul)
@@ -143,6 +144,7 @@ def get_user_latest(symbols: str) -> list:
     url = f"https://api.apilayer.com/exchangerates_data/latest?symbols={symbols}&base=RUB"
     headers = {'apikey': os.getenv('API_KEY')}
     response = requests.get(url, headers=headers)
+    print(response)
     result = response.json()
     my_list = []
     my_dict = result["rates"]
@@ -176,10 +178,15 @@ def get_user_stocks(user_stocks: list) -> list:
     return my_list
 
 
-if __name__ == "__main__":
-    df = get_external_xls(path2)
-    df_filtr = filter_for_date(df, '2021-05-01 00:00:00', '2021-05-05 00:00:00')
-    print(df_filtr)
+# if __name__ == "__main__":
+
+
+#    res = get_user_latest("USD")
+#    print(res)
+
+#    df = get_external_xls(path2)
+#    df_filtr = filter_for_date(df, '2021-05-01 00:00:00', '2021-05-05 00:00:00')
+#    print(df_filtr)
 #     res = get_user_stocks("AAPL")
 #     print(res)
 

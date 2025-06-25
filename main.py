@@ -134,7 +134,7 @@ df_filter = filter_period(df, end_date)
 pay_list = spending_by_category(df_filter, categor)
 while len(pay_list) == 0:
      print("Таких категорий не найдено. Введите другое слово!")
-     category = input()
+     categor = input()
      logger.info('Категория не найдена')
      pay_list = spending_by_category(df_filter, categor)
 logger.info("Сформирован отчёт по расходам в выбранной категории")

@@ -1,5 +1,6 @@
 import pandas as pd
 import pytest
+from datetime import datetime
 
 
 @pytest.fixture()
@@ -21,10 +22,13 @@ def pd_Data_Frame():
 
 @pytest.fixture()
 def pd_Data_Frame2():
+    data1 = datetime.strptime("2021-05-05 00:00:00", '%Y-%m-%d %H:%M:%S')
+    data2 = datetime.strptime("2021-05-02 00:00:00", '%Y-%m-%d %H:%M:%S')
+    data3 = datetime.strptime("2021-05-01 00:00:00", '%Y-%m-%d %H:%M:%S')
     df = pd.DataFrame(
         [
             {
-                "date": ["05.05.2021 00:00:00"],
+                "date": data1,
                 "cards": ["*7197"],
                 "currency": ["RUB"],
                 "payments": [-760.89],
@@ -34,7 +38,7 @@ def pd_Data_Frame2():
                 "amount": [760.89],
             },
             {
-                "date": ["02.05.2021 00:00:00"],
+                "date": data2,
                 "cards": ["*7195"],
                 "currency": ["RUB"],
                 "payments": [-560.89],
@@ -44,7 +48,7 @@ def pd_Data_Frame2():
                 "amount": [560.89],
             },
             {
-                "date": ["01.05.2021 00:00:00"],
+                "date": data3,
                 "cards": ["*6195"],
                 "currency": ["RUB"],
                 "payments": [-460.89],
